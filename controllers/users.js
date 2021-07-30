@@ -19,6 +19,68 @@ exports.getUser = asyncHandler(async (req, res, next) => {
     });
 });
 
+
+//userをフォローして自分のフォローデータを取得
+exports.followUser = asyncHandler(async (req, res, next) => {
+    const { email } = req.body
+    const DBId = await User.findOne({email:email}).select("_id, name")
+    
+    const user = await User.findOneAndUpdate({
+        _id:req.user.id
+        },{$addToSet:{follow:DBId}});
+
+    const followData = await User.findOne({_id:req.user.id}).select("follow")
+
+    res.status(200).json({
+        success:true,
+        data: {
+            followData:followData.follow
+        }
+    });
+})
+
+//フォローデータを取得
+exports.getFollow = asyncHandler(async (req, res, next) => {
+    const followData = await User.findOne({_id:req.user.id}).select("follow")
+    console.log(followData)
+    res.status(200).json({
+        success:true,
+        data: {
+            followData:followData.follow
+        }
+    });
+})
+
+
+//フォロワーのデータを取得
+exports.getFollower = asyncHandler(async (req, res, next) => {
+    
+    const followerData = await User.aggregate([
+        {
+            $match: {"follow._id":req.user.id}
+        },
+        {
+            $unwind:"$follow"
+        },
+        {
+            $replaceRoot:{
+                "newRoot":"$follow"
+            }
+        }
+    ])
+    
+    if(!followerData) {
+        return next (new ErrorResponse('取得に失敗しました', 400))
+    }
+    const count = followerData.length
+
+    res.status(200).json({
+        success:true,
+        data:followerData,count
+    })
+})
+
+
 //ユーザーの作成
 exports.createUser = asyncHandler(async (req, res, next) => {
     const user =await User.create(req.body);

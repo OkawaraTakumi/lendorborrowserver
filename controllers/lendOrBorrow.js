@@ -76,8 +76,7 @@ exports.updateLorBDetail= asyncHandler(async (req, res, next) => {
     const LorBUpdated = await LorB.findOneAndUpdate({
                                                 userFrom,
                                                 userTo,
-                                                }, {$push:{LorBBox:LorBWillUpdate}});
-    console.log(LorBUpdated)                                     
+                                                }, {$push:{LorBBox:LorBWillUpdate}});                                     
     if(!LorBUpdated) {
         return next (new ErrorResponse('貸し借りが存在していません', 400))
     }

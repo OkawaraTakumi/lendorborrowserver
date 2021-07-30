@@ -2,53 +2,20 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-// const negotiateObjSchema =  mongoose.Schema({
-//     negotiateItem:{
-//         type:String
-//     },
-//     negotiateDetail:{
-//         type:String
-//     }
-// })
+const FollowSchema = new mongoose.Schema({
+    _id:{
+      type:String,
+      required:true,
+      unique:true
+    },
+    name:{
+        type:String,
+        required:true,
+        unique:true
+    }
+})
 
-// const negotiateObj = mongoose.model('negotiateObj', negotiateObjSchema) 
 
-// const detailObjSchema = mongoose.Schema({
-//     detailLorBClass:{
-//         type:String
-//     },
-//     aboutLorBDetail:{
-//         type:String
-//     }
-// })
-
-// const detailObj = mongoose.model('detailObj', detailObjSchema) 
-
-// const lendOrBorrowSchema =  mongoose.Schema({
-//     title:{
-//         type:String
-//     },
-//     detail:[detailObjSchema],
-//     userTo:{
-//         type:String
-//     },
-//     userFrom:{
-//         type:String
-//     },
-//     createTime:{
-//         type:Date,
-//         default:Date.now
-//     },
-//     negotiate:{
-//         type:[negotiateObjSchema]
-//     },
-//     objState:{
-//         type:Number,
-//         enum:[1,2,3,9]
-//     }
-// })
-
-// const lendOrBorrowObj = mongoose.model('lendOrBorrowObj', lendOrBorrowSchema) 
 
 const UserSchema = new mongoose.Schema({
     name:{
@@ -79,9 +46,10 @@ const UserSchema = new mongoose.Schema({
         type:Date,
         default:Date.now
     },
-    // LorBTable:{
-    //     type:[lendOrBorrowSchema]
-    // }
+    follow:{
+        type:[FollowSchema],
+        default:[]
+    }
 })
 //パスワードを暗号化
 UserSchema.pre('save',async function(next) {

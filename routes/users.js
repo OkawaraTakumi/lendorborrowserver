@@ -5,8 +5,13 @@ const {
     getUser,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    followUser,
+    getFollow,
+    getFollower
 } = require('../controllers/users');
+
+const { protect } = require('../middlewares/auth');
 
 
 router.get('/fetchUsers', getUsers)
@@ -18,5 +23,8 @@ router.route('/edit/:id')
       .put(updateUser)
       .delete(deleteUser)
 
+router.post('/followUser', protect, followUser)
+router.get('/getFollow', protect, getFollow)
+router.get('/getFollower', protect, getFollower)
 
 module.exports = router;
