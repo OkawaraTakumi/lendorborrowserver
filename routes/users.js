@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router({mergeParams:true});
 const {
-    getUsers,
     getUser,
-    createUser,
     updateUser,
     deleteUser,
     followUser,
@@ -13,18 +11,19 @@ const {
 
 const { protect } = require('../middlewares/auth');
 
+router.use(protect)
 
-router.get('/fetchUsers', getUsers)
 
-router.post('/register', createUser)
+// router.get('/fetchUsers', getUsers)  今のところ必要ない
+// router.post('/register', createUser) この機能はauthに移植
 
-router.route('/edit/:id')
+router.route('/edit')
       .get(getUser)
       .put(updateUser)
       .delete(deleteUser)
 
-router.post('/followUser', protect, followUser)
-router.get('/getFollow', protect, getFollow)
-router.get('/getFollower', protect, getFollower)
+router.post('/followUser', followUser)
+router.get('/getFollow', getFollow)
+router.get('/getFollower', getFollower)
 
 module.exports = router;

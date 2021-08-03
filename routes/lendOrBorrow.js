@@ -18,6 +18,8 @@ const {
 
 const { protect } = require('../middlewares/auth');
 
+router.use(protect)
+
 //createが呼び出され、すでにLorBが存在していた場合は更新処理
 router.post('/createLorB', createLorB, updateLorBDetail)
 router.put('/approveCreate', approveCreate)

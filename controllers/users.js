@@ -11,11 +11,14 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
 //指定したユーザーの情報を取得
 exports.getUser = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.body.id);
 
     res.status(200).json({
         success:true,
-        data:user
+        data:{
+            id:user._id,
+            name:user.name
+        }
     });
 });
 
@@ -43,10 +46,12 @@ exports.followUser = asyncHandler(async (req, res, next) => {
 exports.getFollow = asyncHandler(async (req, res, next) => {
     const followData = await User.findOne({_id:req.user.id}).select("follow")
     console.log(followData)
+    const count = followData.follow.length
     res.status(200).json({
         success:true,
         data: {
-            followData:followData.follow
+            followData:followData.follow,
+            count
         }
     });
 })
@@ -76,7 +81,11 @@ exports.getFollower = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success:true,
-        data:followerData,count
+        data:{
+            followerData,
+            count
+        }
+            
     })
 })
 
@@ -93,7 +102,7 @@ exports.createUser = asyncHandler(async (req, res, next) => {
 
 //ユーザー情報の更新
 exports.updateUser = asyncHandler(async (req, res, next) => {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const user = await User.findByIdAndUpdate(req.body.id, req.body, {
         new: true,
         runValidators:true
     });
@@ -104,7 +113,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     });
 });
 
-
+//ユーザーの削除処理
 exports.deleteUser = asyncHandler(async (req, res ,next) => {
     await User.findByIdAndDelete(req.params.id);
 

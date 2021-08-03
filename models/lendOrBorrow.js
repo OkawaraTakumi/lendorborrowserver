@@ -15,7 +15,7 @@ const LorBdetailSchema = mongoose.Schema({
     LorBState:{
         type:Number,
         enum:[1,2,3,4],
-        default:1
+        default:4
     },
     negotiateItem:{
         type:String,

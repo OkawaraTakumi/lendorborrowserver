@@ -13,7 +13,6 @@ const ON_MAKING_LORB = 4;
 
 //LorBTableの作成
 exports.createLorB = asyncHandler(async (req, res, next) => {
-    console.log(req.body)
     const {
         title,
         detailClass,
@@ -81,7 +80,7 @@ exports.updateLorBDetail= asyncHandler(async (req, res, next) => {
         return next (new ErrorResponse('貸し借りが存在していません', 400))
     }
 
-    res.status(204).json({
+    res.status(201).json({
         success: true,
     })
 })
@@ -172,15 +171,19 @@ const reqUserFrom = ObjectId(userFrom)
 
 //作成依頼中の貸し借りの取得
 exports.getOnMaking= asyncHandler(async (req, res, next) => {
-    const { userForApprove } = req.body
+    const  userForApprove  = req.user.id
     console.log(userForApprove)
-    
     const onMaking = await LorB.aggregate([
         {
             $match: {"LorBBox.LorBState":ON_MAKING_LORB}
         },
         {
             $unwind:"$LorBBox"
+        },
+        {
+            $match:{
+                "LorBBox.LorBState":ON_MAKING_LORB
+            }
         },
         {
             $match:{
@@ -205,8 +208,8 @@ exports.getOnMaking= asyncHandler(async (req, res, next) => {
 
 //交渉提案中の貸し借りの取得
 exports.getOnBeingSuggested = asyncHandler(async (req, res, next) => {
-    const { user } = req.body
-    
+    const user = req.user.id
+    console.log(user)
     const onBeingSuggested = await LorB.aggregate([
         {
             $match: {userTo:user}
@@ -228,7 +231,10 @@ exports.getOnBeingSuggested = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success:true,
-        data:onBeingSuggested,count
+        data:{
+            onBeingSuggested,
+            count
+        }
     })
 })
 
@@ -236,9 +242,7 @@ exports.getOnBeingSuggested = asyncHandler(async (req, res, next) => {
 
 //解消済みの貸し借りを取得
 exports.getLorBCompleted = asyncHandler(async (req, res, next) => {
-    const { 
-        user
-      } = req.body
+    const user = req.user.id
 console.log("完了済みの取得動いてます")
 // const reqUserFrom = ObjectId(userFrom)
     
@@ -283,10 +287,8 @@ console.log("完了済みの取得動いてます")
 
 //継続中の貸し借りを取得
 exports.getLorBKeepLorB = asyncHandler(async (req, res, next) => {
-    const { 
-        user
-      } = req.body
-    
+    const user = req.user.id
+    console.log(user)
     const LKeepOn = await LorB.aggregate([
         {
             $match:  {userFrom:user}
@@ -320,16 +322,16 @@ exports.getLorBKeepLorB = asyncHandler(async (req, res, next) => {
         success: true,
         data: {
             LKeepOn:LKeepOn,
-            BKeepOn:BKeepOn
+            LCount:LKeepOn.length,
+            BKeepOn:BKeepOn,
+            BCount:BKeepOn.length
         }
     })
 } )
 
 
 exports.getLorBIhave = asyncHandler( async (req, res, next) => {
-    const { 
-        userTo
-      } = req.body
+    const userTo = req.user.Id
 
 const reqUserTo = ObjectId(userTo)
 
@@ -362,13 +364,6 @@ exports.deleteLorBtable = asyncHandler (async (req, res, next) => {
       } = req.body
 
     const reqLorBId = ObjectId(id)
-    // const user = await User.findById(req.user.id,function (err, user) {
-    //     console.log(user)
-    //     user.LorBTable.splice(index, 1);
-    //     user.save(function(err){
-    //         res.send(err);
-    //     });
-    // });
 
     try {await LorB.findOneAndUpdate({
         userFrom,
@@ -395,7 +390,6 @@ exports.updateNegotiate= asyncHandler(async (req, res, next) => {
             userTo,
             negotiateItem,
             negotiateDetail,
-            index,
             id
           } = req.body
 
@@ -421,8 +415,7 @@ exports.updateNegotiate= asyncHandler(async (req, res, next) => {
     }
 
     res.status(200).json({
-        success: true,
-        data: negotiateUpdated
+        success: true
     })
 })
 
