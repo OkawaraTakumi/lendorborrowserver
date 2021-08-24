@@ -7,6 +7,7 @@ const {
     updateLorBDetail,
     getLorBIhave,
     updateNegotiate,
+    rejectNegotiate,
     deleteLorBtable,
     getLorBCompleted,
     getOnBeingSuggested,
@@ -32,6 +33,7 @@ router.get('/getAllLorB', getAllLorB)
 router.get('/getLorBIhave', getLorBIhave)
 router.get('/getLorBCompleted', getLorBCompleted)
 router.put('/updateNegotiate', updateNegotiate)
+router.put('/rejectNegotiate', rejectNegotiate)
 router.put('/deleteLorBtable', deleteLorBtable);
 
 

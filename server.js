@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const errorHandler = require('./middlewares/error');
 const cookieParser = require('cookie-parser');
@@ -16,6 +17,12 @@ dotenv.config({ path:'./config/config.env' });
 connectDB();
 
 const app = express();
+
+//CORSの設定
+app.use(cors({
+    credentials:true,
+    origin:"http://localhost:3000"
+}))
 
 //jsonを取得できるようにパースする
 app.use(express.json())

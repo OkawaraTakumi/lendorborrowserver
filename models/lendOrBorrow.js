@@ -39,7 +39,15 @@ const LorBSchema =  mongoose.Schema({
         type:String,
         require:true
     },
+    userToName:{
+        type:String,
+        require:true
+    },
     userFrom:{
+        type:String,
+        require:true
+    },
+    userFromName:{
         type:String,
         require:true
     },

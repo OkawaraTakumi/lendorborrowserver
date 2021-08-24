@@ -13,6 +13,7 @@ const FollowSchema = new mongoose.Schema({
         required:true,
         unique:true
     }
+    
 })
 
 
@@ -48,7 +49,8 @@ const UserSchema = new mongoose.Schema({
     },
     follow:{
         type:[FollowSchema],
-        default:[]
+        default:[],
+        unique:true
     }
 })
 //パスワードを暗号化

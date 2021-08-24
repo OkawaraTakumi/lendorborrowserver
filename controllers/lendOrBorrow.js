@@ -10,6 +10,7 @@ const KEEP_LORB = 1;
 const ON_SUGGUESTING = 2;
 const COMPLETED = 3;
 const ON_MAKING_LORB = 4;
+const REJECTED = 5;
 
 //LorBTableの作成
 exports.createLorB = asyncHandler(async (req, res, next) => {
@@ -18,7 +19,9 @@ exports.createLorB = asyncHandler(async (req, res, next) => {
         detailClass,
         aboutDetail,
         userTo,
+        userToName,
         userFrom,
+        userFromName,
         userForApprove
     } = req.body
 
@@ -35,7 +38,9 @@ exports.createLorB = asyncHandler(async (req, res, next) => {
     const LorBWillCreate = {
         LorBBox:LorBdetail,
         userTo: reqUserTo,
-        userFrom: reqUserFrom
+        userToName:userToName,
+        userFrom: reqUserFrom,
+        userFromName:userFromName,
     }
 
     try {
@@ -44,7 +49,7 @@ exports.createLorB = asyncHandler(async (req, res, next) => {
         res.status(201).json({
         success:true
       });
-    } catch {
+    } catch(error) {
         next()
     }
     
@@ -88,10 +93,13 @@ exports.updateLorBDetail= asyncHandler(async (req, res, next) => {
 //貸し借りの作成を承認
 exports.approveCreate= asyncHandler(async (req, res, next) => {
     const { 
-            userFrom,
-            userTo,
-            id
-          } = req.body
+        userFrom,
+        userTo,
+        id
+    } = req.body
+    console.log(userFrom)
+    console.log(userTo)
+    console.log(id)
     const reqApproveId = ObjectId(id)
 
     const negotiateWillApprove = await LorB.findOneAndUpdate({
@@ -112,17 +120,20 @@ exports.approveCreate= asyncHandler(async (req, res, next) => {
 //貸し借りの作成を拒否
 exports.rejectCreate= asyncHandler(async (req, res, next) => {
     const { 
-            userFrom,
-            userTo,
-            id
-          } = req.body
-    const reqDeleteId = ObjectId(id)
+        userFrom,
+        userTo,
+        id
+    } = req.body
+    console.log(userFrom)
+    console.log(userTo)
+    console.log(id)
+    const reqApproveId = ObjectId(id)
 
-    const negotiateWillApprove = await LorB.deleteOne({
+    const negotiateWillApprove = await LorB.findOneAndUpdate({
                                                 userFrom,
                                                 userTo,
-                                                "LorBBox._id":reqDeleteId
-                                                });
+                                                "LorBBox._id":reqApproveId
+                                                }, {$set:{"LorBBox.$.LorBState": REJECTED}});
     if(!negotiateWillApprove) {
         return next (new ErrorResponse('承認できませんでした', 400))
     }
@@ -199,9 +210,9 @@ exports.getOnMaking= asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success:true,
-        data:{
+        onMaking:{
             onMaking:onMaking,
-            count:count
+            count:count   
         }
     })
 })
@@ -231,7 +242,7 @@ exports.getOnBeingSuggested = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success:true,
-        data:{
+        onBeingSuggested:{
             onBeingSuggested,
             count
         }
@@ -280,7 +291,10 @@ console.log("完了済みの取得動いてます")
 
     res.status(200).json({
         success: true,
-        data: LCompleted,BCompleted
+        completed:{
+            LCompleted,
+            BCompleted
+        }
     })
 } )
 
@@ -320,7 +334,7 @@ exports.getLorBKeepLorB = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        data: {
+        keepLorB: {
             LKeepOn:LKeepOn,
             LCount:LKeepOn.length,
             BKeepOn:BKeepOn,
@@ -399,7 +413,7 @@ exports.updateNegotiate= asyncHandler(async (req, res, next) => {
         negotiateItem:negotiateItem,
         negotiateDetail:negotiateDetail
     }
-    
+    console.log(id,'idはこれ')
     const reqNegotiateId = ObjectId(id)
 
     const negotiateUpdated = await LorB.findOneAndUpdate({
@@ -419,4 +433,28 @@ exports.updateNegotiate= asyncHandler(async (req, res, next) => {
     })
 })
 
+
+//交渉を拒否
+exports.rejectNegotiate= asyncHandler(async (req, res, next) => {
+    const { 
+        userFrom,
+        userTo,
+        id
+    } = req.body
+
+    const reqApproveId = ObjectId(id)
+
+    const negotiateWillApprove = await LorB.findOneAndUpdate({
+                                                userFrom,
+                                                userTo,
+                                                "LorBBox._id":reqApproveId
+                                                }, {$set:{"LorBBox.$.LorBState": KEEP_LORB}});
+    if(!negotiateWillApprove) {
+        return next (new ErrorResponse('拒否できませんでした', 400))
+    }
+
+    res.status(200).json({
+        success: true
+    })
+})
 

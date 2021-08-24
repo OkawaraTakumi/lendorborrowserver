@@ -46,17 +46,19 @@ exports.login = asyncHandler(async (req, res, next) => {
 //ログインユーザーの情報を取得
 
 exports.getCurrentUser = asyncHandler(async (req, res, next) => {
+    console.log(req.user)
     const user = await User.findById(req.user.id);
 
     res.status(200).json({
         success: true,
-        data: user
+        user
     })
 })
 
 //modelからtokenを取得し、cookieを生成
 
 const sendTokenResponse = (user, statusCode, res) => {
+    console.log(user,'作成されたユーザー')
     const token = user.getSignedJwtToken();
 
     const options = {
@@ -70,12 +72,18 @@ const sendTokenResponse = (user, statusCode, res) => {
         options.secure = true;
     }
 
+    const { name, _id } = user
+    console.log(token,'動いてます')
     res
       .status(statusCode)
       .cookie('token', token, options)
       .json({
           success:true,
-          token
+          token,
+          user:{
+              name,
+              id:_id
+          }
       })
 } 
 

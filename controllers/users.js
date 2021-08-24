@@ -2,6 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middlewares/async');
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const ObjectId = require('mongodb').ObjectId
 
 
 //ユーザー情報をまとめて取得
@@ -26,8 +27,9 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 //userをフォローして自分のフォローデータを取得
 exports.followUser = asyncHandler(async (req, res, next) => {
     const { email } = req.body
+    console.log(email)
     const DBId = await User.findOne({email:email}).select("_id, name")
-    
+    console.log(DBId)
     const user = await User.findOneAndUpdate({
         _id:req.user.id
         },{$addToSet:{follow:DBId}});
@@ -45,22 +47,24 @@ exports.followUser = asyncHandler(async (req, res, next) => {
 //フォローデータを取得
 exports.getFollow = asyncHandler(async (req, res, next) => {
     const followData = await User.findOne({_id:req.user.id}).select("follow")
-    console.log(followData)
+    console.log(followData,'followData')
     const count = followData.follow.length
+    console.log(followData.follow)
     res.status(200).json({
         success:true,
-        data: {
-            followData:followData.follow,
-            count
-        }
+        followData:followData.follow,
+        count
     });
 })
 
 
 //フォロワーのデータを取得
 exports.getFollower = asyncHandler(async (req, res, next) => {
-    
+    const myId = ObjectId(req.user.id)
     const followerData = await User.aggregate([
+        {
+            $match:{"_id":{"$ne":myId}}
+        },
         {
             $match: {"follow._id":req.user.id}
         },
@@ -81,11 +85,8 @@ exports.getFollower = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success:true,
-        data:{
-            followerData,
-            count
-        }
-            
+        followerData,
+        count
     })
 })
 
