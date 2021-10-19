@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-const negotiateObjSchema = new mongoose.Schema({
-    negotiateItem:{
-        type:String
-    },
-    negotiateDetail:{
-        type:String
-    }
-})
+// const negotiateObjSchema = new mongoose.Schema({
+//     negotiateItem:{
+//         type:String
+//     },
+//     negotiateDetail:{
+//         type:String
+//     }
+// })
 
-module.exports = mongoose.model('detailObj',detailObjSchema)
+// module.exports = mongoose.model('detailObj',detailObjSchema)
